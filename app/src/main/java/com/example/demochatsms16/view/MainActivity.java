@@ -1,4 +1,4 @@
-package com.example.demochatsms16.vieư;
+package com.example.demochatsms16.view;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

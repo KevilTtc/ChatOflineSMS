@@ -2,6 +2,7 @@ package com.example.demochatsms16.viewchat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -29,6 +31,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.demochatsms16.R;
 import com.example.demochatsms16.adapter.AdapterViewChat;
+import com.example.demochatsms16.dialog.CommonActivity;
+import com.example.demochatsms16.dialog.CommonDialog;
 import com.example.demochatsms16.viewchat.viewmodelchat.ViewModelChatSMS;
 import com.example.demochatsms16.viewchat.viewmodelchat.ListChat;
 import com.example.demochatsms16.database.DataBaseMsg;
@@ -55,6 +59,8 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
     private EditText edt_msg;
     private RecyclerView recyClerSMSActivity;
     private Toolbar toolbar;
+    BroadcastReceiver broadcastReceiver;
+    Application activity;
 
 
     @NotNull
@@ -75,6 +81,7 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_chat);
+        activity = getApplication();
         init();
         // model = new ViewModelProvider.of(this).get(ViewModelChat.class);
         model = new ViewModelProvider(this).get(ViewModelChatSMS.class);
@@ -84,7 +91,7 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
 
 
         intentFilter.addAction("SMS_RECEIVED_ACTION");
-        BroadcastReceiver broadcastReceiver = (BroadcastReceiver) this.intentReceiver();
+        broadcastReceiver = (BroadcastReceiver) this.intentReceiver();
         this.registerReceiver(broadcastReceiver, intentFilter);
         this.checkper();
 
@@ -131,31 +138,42 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
         if (idSend != null) {
             if (idSend == id) {
 
-                edtNumberSent.setVisibility(View.GONE);
-                tvNumberSent.setVisibility(View.VISIBLE);
+
                 String strNumberSend = edtNumberSent.getText().toString();
                 String edtSMG = edt_msg.getText().toString();
 
-                if (strNumberSend != null && strNumberSend.length() != 0) {
+                if (!CommonActivity.isNullOrEmpty(strNumberSend) && !CommonActivity.isNullOrEmpty(edtSMG)){
+                    edtNumberSent.setVisibility(View.GONE);
+                    tvNumberSent.setVisibility(View.VISIBLE);
+                    if (strNumberSend != null && strNumberSend.length() != 0) {
 
-                    tvNumberSent.setText(strNumberSend);
-                    this.number = tvNumberSent.getText().toString();
+                        tvNumberSent.setText(strNumberSend);
+                        this.number = tvNumberSent.getText().toString();
+                    }
+
+                    this.sendMsg(number, edtSMG);
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                    Date date = new Date();
+
+                    String formatDate = formatter.format(date);
+                    ObDataMess data = new ObDataMess(0, number, edtSMG, formatDate, 1);
+                    database.insertSMG(data);
+                    model.getChat(this.number, (Context) this, (ListChat) this);
+                    edt_msg.setText("");
+                    this.setResult(Activity.RESULT_OK);
+                }else if (CommonActivity.isNullOrEmpty(strNumberSend)){
+                    // CommonDialog.showConfirmValidate(activity,R.string.validate_number);
+                    Toast.makeText(getApplicationContext(),getString(R.string.validate_number), Toast.LENGTH_LONG).show();
+                }else if (CommonActivity.isNullOrEmpty(edtSMG)){
+                    // CommonDialog.showConfirmValidate(activity,R.string.validate_smg);
+                    Toast.makeText(getApplicationContext(),getString(R.string.validate_smg), Toast.LENGTH_LONG).show();
                 }
 
-                this.sendMsg(number, edtSMG);
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                Date date = new Date();
-
-                String formatDate = formatter.format(date);
-                ObDataMess data = new ObDataMess(0, number, edtSMG, formatDate, 1);
-                database.insertSMG(data);
-                model.getChat(this.number, (Context) this, (ListChat) this);
-                edt_msg.setText("");
-                this.setResult(Activity.RESULT_OK);
             }
         }
 
     }
+
 
     public final void sendMsg(@NotNull String number, @NotNull String myMsg) {
         String sent = "Message Sent";
@@ -164,16 +182,13 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
         PendingIntent deliveredPI = PendingIntent.getBroadcast((Context) this, 0, new Intent(delivered), 0);
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(number, (String) null, myMsg, sentPI, deliveredPI);
+
+
     }
 
     protected void onDestroy() {
         super.onDestroy();
-
-        try {
-            this.unregisterReceiver((BroadcastReceiver) this.intentReceiver());
-        } catch (IllegalArgumentException var2) {
-            Log.e("smg", String.valueOf(var2.getMessage()));
-        }
+        unregisterReceiver(broadcastReceiver);
 
     }
 
@@ -187,7 +202,7 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void listChat(@NotNull LiveData liveData) {
-        if (liveData != null){
+        if (liveData != null) {
             liveData.observe((LifecycleOwner) this, (Observer) (new Observer() {
 
                 public void onChanged(Object var1) {

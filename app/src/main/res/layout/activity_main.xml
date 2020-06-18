@@ -5,11 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorWhite"
-    tools:context=".vieư.MainActivity">
+    tools:context=".view.MainActivity">
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rccMg"
+        tools:listitem="@layout/item_sms"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

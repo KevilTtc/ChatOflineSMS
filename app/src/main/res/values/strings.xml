@@ -2,4 +2,7 @@
     <string name="app_name">Chat SMS</string>
     <string name="text_sent">Send</string>
     <string name="hint_number">Nhập số điện thoại</string>
+    <string name="validate_number">Bạn chưa nhập số điện thoại</string>
+    <string name="validate_smg">Bạn chưa nhập tin nhắn</string>
+    <string name="errorProcess">Có lỗi xảy ra trong quá trình xử lý. Vui lòng kiểm tra lại.</string>
 </resources>
