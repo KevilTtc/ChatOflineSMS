@@ -1,0 +1,2 @@
+rootProject.name='DemoChatSMS16'
+include ':app'

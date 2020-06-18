@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:background="@color/colorGray"
+    tools:context=".chat.MsgActivity">
+
+    <androidx.appcompat.widget.Toolbar
+
+        android:id="@+id/toolbar"
+        android:background="@color/colorWhite"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:theme="@color/colorPrimaryDark"
+        >
+        <RelativeLayout
+            android:id="@+id/rltTop"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:textColor="#000"
+                android:textSize="22sp"
+                android:layout_centerVertical="true"
+                android:id="@+id/tvNumberSent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+               />
+            <EditText
+                android:hint="@string/hint_number"
+                android:textColor="#000"
+                android:textSize="22sp"
+                android:layout_centerVertical="true"
+                android:id="@+id/edtNumberSent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                 />
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <RelativeLayout
+        android:id="@+id/rltBottom"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorWhite">
+
+        <EditText
+            android:layout_marginStart="8dp"
+            android:id="@+id/edt_msg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/imgFile" />
+
+        <ImageView
+            android:id="@+id/imgFile"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/btnSentMg"
+            android:src="@drawable/ic_attach_file" />
+
+        <Button
+            android:id="@+id/btnSentMg"
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="8dp"
+            android:background="@color/colorAccent"
+            android:text="@string/text_sent"
+            android:textColor="@color/colorWhite" />
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rccChat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/rltBottom"
+        android:layout_below="@+id/toolbar"
+       />
+
+</RelativeLayout>

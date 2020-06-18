@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Chat SMS</string>
+    <string name="text_sent">Send</string>
+    <string name="hint_number">Nhập số điện thoại</string>
+</resources>
