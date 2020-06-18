@@ -1,4 +1,4 @@
-package com.example.demochatsms16.dialog;
+package com.example.demochatsms16.common;
 
 import android.app.Application;
 import android.app.Dialog;

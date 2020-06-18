@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -31,8 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.demochatsms16.R;
 import com.example.demochatsms16.adapter.AdapterViewChat;
-import com.example.demochatsms16.dialog.CommonActivity;
-import com.example.demochatsms16.dialog.CommonDialog;
+import com.example.demochatsms16.common.CommonActivity;
 import com.example.demochatsms16.viewchat.viewmodelchat.ViewModelChatSMS;
 import com.example.demochatsms16.viewchat.viewmodelchat.ListChat;
 import com.example.demochatsms16.database.DataBaseMsg;
@@ -69,11 +67,14 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
         return viewModelChatSMS;
     }
 
+
+
     public final void setModel(@NotNull ViewModelChatSMS var1) {
         this.model = var1;
     }
 
     public boolean onCreateOptionsMenu(@Nullable Menu menu) {
+        this.getMenuInflater().inflate(R.menu.chat_menu_toolbar, menu);
         return true;
     }
 
@@ -110,7 +111,7 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
         model.getChat(this.number, (Context) this, (ListChat) this);
         this.linearLayoutManager = new LinearLayoutManager((Context) this);
         recyClerSMSActivity.setLayoutManager(linearLayoutManager);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         btnSend.setOnClickListener(this);
     }
 
@@ -138,11 +139,10 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
         if (idSend != null) {
             if (idSend == id) {
 
-
                 String strNumberSend = edtNumberSent.getText().toString();
                 String edtSMG = edt_msg.getText().toString();
 
-                if (!CommonActivity.isNullOrEmpty(strNumberSend) && !CommonActivity.isNullOrEmpty(edtSMG)){
+                if (!CommonActivity.isNullOrEmpty(number) && !CommonActivity.isNullOrEmpty(edtSMG)){
                     edtNumberSent.setVisibility(View.GONE);
                     tvNumberSent.setVisibility(View.VISIBLE);
                     if (strNumberSend != null && strNumberSend.length() != 0) {
@@ -161,7 +161,7 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
                     model.getChat(this.number, (Context) this, (ListChat) this);
                     edt_msg.setText("");
                     this.setResult(Activity.RESULT_OK);
-                }else if (CommonActivity.isNullOrEmpty(strNumberSend)){
+                }else if (CommonActivity.isNullOrEmpty(number)){
                     // CommonDialog.showConfirmValidate(activity,R.string.validate_number);
                     Toast.makeText(getApplicationContext(),getString(R.string.validate_number), Toast.LENGTH_LONG).show();
                 }else if (CommonActivity.isNullOrEmpty(edtSMG)){
@@ -200,6 +200,7 @@ public final class MsgActivity extends AppCompatActivity implements View.OnClick
             }
         };
     }
+
 
     public void listChat(@NotNull LiveData liveData) {
         if (liveData != null) {

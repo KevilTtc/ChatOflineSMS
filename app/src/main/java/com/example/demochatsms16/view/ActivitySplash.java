@@ -35,7 +35,7 @@ public class ActivitySplash extends AppCompatActivity {
                 this, Manifest.permission.SEND_SMS) ==
                 PackageManager.PERMISSION_GRANTED) {
 
-            Intent i = new Intent(ActivitySplash.this , MainActivity.class);
+            Intent i = new Intent(ActivitySplash.this , MainView.class);
             startActivity(i);
 
 
@@ -43,7 +43,7 @@ public class ActivitySplash extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS,
                     Manifest.permission.READ_SMS,
                     Manifest.permission.SEND_SMS}, 1000);
-            Intent i = new Intent(ActivitySplash.this , MainActivity.class);
+            Intent i = new Intent(ActivitySplash.this , MainView.class);
             startActivity(i);
 
         }
@@ -55,7 +55,7 @@ public class ActivitySplash extends AppCompatActivity {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1000){
-            Intent i = new Intent(ActivitySplash.this , MainActivity.class);
+            Intent i = new Intent(ActivitySplash.this , MainView.class);
             startActivity(i);
             finish();
         }

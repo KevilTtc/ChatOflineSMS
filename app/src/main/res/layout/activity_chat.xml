@@ -33,6 +33,7 @@
                />
             <EditText
                 android:hint="@string/hint_number"
+                android:inputType="number"
                 android:textColor="#000"
                 android:textSize="22sp"
                 android:layout_centerVertical="true"
@@ -44,45 +45,69 @@
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 
-    <RelativeLayout
-        android:id="@+id/rltBottom"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+    <ScrollView
         android:layout_alignParentBottom="true"
-        android:background="@color/colorWhite">
-
-        <EditText
-            android:layout_marginStart="8dp"
-            android:id="@+id/edt_msg"
+        android:id="@+id/scr_send"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="5"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/imgFile" />
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_marginLeft="6dp"
+                android:layout_weight="4.3"
+                android:id="@+id/rltBottom"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/colorWhite">
 
-        <ImageView
-            android:visibility="gone"
-            android:id="@+id/imgFile"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="8dp"
-            android:layout_toStartOf="@id/btnSentMg"
-            android:src="@drawable/ic_attach_file" />
+                <EditText
+                    android:layout_marginStart="8dp"
+                    android:singleLine="false"
+                    android:id="@+id/edt_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/imgFile" />
 
-        <Button
-            android:id="@+id/btnSentMg"
-            android:layout_width="55dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="8dp"
-            android:background="@drawable/send"
-            android:textColor="@color/colorWhite" />
-    </RelativeLayout>
+                <ImageView
+                    android:visibility="gone"
+                    android:id="@+id/imgFile"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@id/btnSentMg"
+                    android:src="@drawable/ic_attach_file"
+                    tools:ignore="NotSibling" />
+
+
+            </RelativeLayout>
+
+            <Button
+                android:layout_weight="0.7"
+                android:id="@+id/btnSentMg"
+                android:layout_width="0dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="8dp"
+                android:background="@drawable/send"
+                android:textColor="@color/colorWhite" />
+        </LinearLayout>
+
+    </ScrollView>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rccChat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/rltBottom"
+        android:layout_above="@+id/scr_send"
         android:layout_below="@+id/toolbar"
        />
 

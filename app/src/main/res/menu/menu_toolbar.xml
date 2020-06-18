@@ -3,9 +3,9 @@
 
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu1"
-        android:icon="@drawable/ic_delete"
-        android:title="delete"
+        android:id="@+id/contact"
+        android:icon="@drawable/contact"
+        android:title="Contact"
         app:showAsAction="always" />
 
 </menu>

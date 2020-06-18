@@ -1,13 +1,17 @@
 package com.example.demochatsms16.view;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -24,6 +28,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -49,11 +54,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static android.app.ActionBar.DISPLAY_SHOW_CUSTOM;
+import static androidx.appcompat.app.ActionBar.DISPLAY_SHOW_CUSTOM;
 
 
-public final class MainActivity extends AppCompatActivity implements OnClickListener,
+public final class MainView extends AppCompatActivity implements OnClickListener,
         EventListMsg, EventResoultDelete, EventFloatingButon, EventCheckBox {
+    private static final int REQUEST_CODE_CONTACT = 999;
     private AdapterMainSMG adapterMg;
 
     // ViewModel viewModel = new ViewModelProvider(ViewModelStoreOwner.class, ViewModelMain.class);
@@ -78,23 +84,28 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
     }
 
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_toolbar, menu);
+        return true;
+    }
+
     @SuppressLint("WrongConstant")
     @RequiresApi(Build.VERSION_CODES.N)
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+
         ActionBar actionBar = this.getSupportActionBar();
-        model = new ViewModelProvider(this).get(ViewModelMain.class);
-        if (actionBar != null) {
-            actionBar.setDisplayOptions(DISPLAY_SHOW_CUSTOM);
-        }
+//        if (actionBar != null) {
+//            actionBar.setDisplayOptions(DISPLAY_SHOW_CUSTOM);
+//        }
 
         actionBar = this.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setCustomView(R.layout.acition_bar_center);
-        }
-
+//        if (actionBar != null) {
+//            actionBar.setCustomView(R.layout.acition_bar_center);
+//        }
         // model = new ViewModelProvider(this,new ViewModelMain()).get(ViewModelStoreOwner.class);
         model = new ViewModelProvider(this).get(ViewModelMain.class);
         this.intentFilter = new IntentFilter();
@@ -103,10 +114,10 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
         BroadcastReceiver broadcastReceiver = this.intentReceiver();
 
         this.registerReceiver(broadcastReceiver, intentFilter);
-        if (ContextCompat.checkSelfPermission((Context) this, "android.permission.RECEIVE_MMS")
+        if (ContextCompat.checkSelfPermission((Context) this, Manifest.permission.RECEIVE_MMS)
                 != 0 && !ActivityCompat.shouldShowRequestPermissionRationale((Activity) this,
-                "android.permission.RECEIVE_MMS")) {
-            ActivityCompat.requestPermissions((Activity) this, new String[]{"android.permission.RECEIVE_SMS"},
+                Manifest.permission.RECEIVE_MMS)) {
+            ActivityCompat.requestPermissions((Activity) this, new String[]{Manifest.permission.RECEIVE_SMS},
                     this.MY_PERMISSIONS_SEND_SMS);
         }
 
@@ -114,7 +125,7 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
         this.linearLayoutManager = new LinearLayoutManager((Context) this);
         RecyclerView recyclerViewMain = findViewById(R.id.rccMg);
         recyclerViewMain.setLayoutManager(linearLayoutManager);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         floatingActionButton.setOnClickListener(this);
     }
 
@@ -127,7 +138,7 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
             @RequiresApi(Build.VERSION_CODES.N)
             public void onReceive(@org.jetbrains.annotations.Nullable Context context,
                                   @org.jetbrains.annotations.Nullable Intent intent) {
-                MainActivity.this.getModel().getListMSG((Context) MainActivity.this, (EventListMsg) MainActivity.this);
+                MainView.this.getModel().getListMSG((Context) MainView.this, (EventListMsg) MainView.this);
             }
         };
     }
@@ -139,7 +150,52 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
             model.getListMSG((Context) this, (EventListMsg) this);
         }
 
+        switch (requestCode) {
+            case (REQUEST_CODE_CONTACT):
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri contactData = data.getData();
+                    Cursor c = getContentResolver().query(contactData, null, null, null, null);
+                    if (c.moveToFirst()) {
+                        String contactId = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+                        String hasNumber = c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                        String num = "";
+                        if (Integer.valueOf(hasNumber) == 1) {
+                            Cursor numbers = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null);
+                            while (numbers.moveToNext()) {
+                                num = numbers.getString(numbers.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                Toast.makeText(MainView.this, "Number=" + num, Toast.LENGTH_LONG).show();
+                                startNewSendSMS(num);
+                            }
+                        }
+                    }
+                    break;
+                }
+
+        }
+
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.contact:
+                // todo: goto back activity from here
+                colectContactNumber();
+               // finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void colectContactNumber(){
+        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        startActivityForResult(intent, REQUEST_CODE_CONTACT);
+    }
+
+
+
 
     public void getlistMsg(@NotNull LiveData listMsg) {
         listMsg.observe((LifecycleOwner) this, (Observer) (new Observer() {
@@ -150,8 +206,8 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
 
             public final void onChanged(List<ObDataMess> list) {
                 AdapterMainSMG adapterMg = new AdapterMainSMG(list, getApplication());
-                adapterMg.setiClickFloatingButon(MainActivity.this);
-                adapterMg.setiCheckBox(MainActivity.this);
+                adapterMg.setiClickFloatingButon(MainView.this);
+                adapterMg.setiCheckBox(MainView.this);
                 RecyclerView recyclerView = findViewById((R.id.rccMg));
                 recyclerView.setAdapter(adapterMg);
 
@@ -160,6 +216,10 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
     }
 
     public void onClick(@NotNull String number) {
+        startNewSendSMS(number);
+    }
+
+    private void startNewSendSMS(String number){
         Intent intent = new Intent((Context) this, MsgActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("number", number);
@@ -179,7 +239,7 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
                 actionMode.finish();
             }
         } else {
-            this.actionMode = this.startActionMode((Callback) (new MainActivity.ActionModeCallback()));
+            this.actionMode = this.startActionMode((Callback) (new MainView.ActionModeCallback()));
         }
 
         int i = 0;
@@ -212,7 +272,7 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
 
     }
 
-    public MainActivity() {
+    public MainView() {
         List list = (List) (new ArrayList());
         this.lisStrin = list;
     }
@@ -240,8 +300,8 @@ public final class MainActivity extends AppCompatActivity implements OnClickList
 
     public final class ActionModeCallback implements Callback {
         public boolean onActionItemClicked(@Nullable ActionMode mode, @Nullable MenuItem item) {
-            MainActivity.this.getModel().delete((Context) MainActivity.this,
-                    MainActivity.this.lisStrin, (EventResoultDelete) MainActivity.this);
+            MainView.this.getModel().delete((Context) MainView.this,
+                    MainView.this.lisStrin, (EventResoultDelete) MainView.this);
             return false;
         }
 

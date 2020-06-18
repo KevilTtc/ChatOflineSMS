@@ -2,20 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:visible="false"
         android:id="@+id/menu1"
         android:icon="@drawable/ic_delete_black"
         android:title="delete"
         app:showAsAction="always" />
     <item
+        android:visible="false"
         android:id="@+id/menu2"
         android:title="Search"
         app:showAsAction="never" />
     <item
+        android:visible="false"
         android:id="@+id/menu3"
         android:title="Saved box"
         app:showAsAction="never" />
 
     <item
+        android:visible="false"
         android:id="@+id/menu4"
         android:title="Settings"
         app:showAsAction="never" />
